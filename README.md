@@ -54,4 +54,4 @@ docker compose up -d --build
 open http://localhost:8000
 ```
 
-See the main [`README.md`](https://github.com/seapoe1809/Hidra/README.md) for configuration and security notes.
+See the main [`README.md`](https://github.com/seapoe1809/Hidra/blob/main/README.md) for configuration and security notes.
