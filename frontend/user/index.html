@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a152c" />
+  <title>Darnahi · User</title>
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" href="/assets/favicon.png" />
+  <link rel="stylesheet" href="/css/style.css?v=8" />
+</head>
+<body>
+  <header class="bar">
+    <h1><img class="logo" src="/assets/favicon.png" alt="" /><span class="txt">Darnahi · User</span></h1>
+    <div class="right">
+      <button id="qr-btn" class="secondary hidden" title="Show ID QR">QR</button>
+      <a class="btn secondary" href="/">← Home</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ============ ENROLLMENT ============ -->
+    <section id="enroll-view">
+      <h2>User Enrollment Form</h2>
+      <p class="sub">Enroll with a hospital. Your details are encrypted and a private
+        identity key is generated for you.</p>
+
+      <form id="enroll-form">
+        <!-- Shown only when the hospital npub isn't carried by the enrollment link. -->
+        <div id="hub-field" class="hidden">
+          <label>Hospital npub (where your information is sent) <span style="color:#c0392b">*</span></label>
+          <input type="text" name="hub_npub" placeholder="npub1… (the hospital's mailbox)" />
+        </div>
+        <p id="hub-note" class="status hidden"></p>
+
+        <label>Name of Individual</label>
+        <input type="text" name="first_name" placeholder="John M" required />
+
+        <label>Last Name</label>
+        <input type="text" name="last_name" placeholder="Smith" required />
+
+        <label>Cell Phone / email</label>
+        <input type="text" name="phone" placeholder="5551234567" />
+
+        <label>Date of Birth (DD/MM/YYYY)</label>
+        <input type="text" name="dob" placeholder="01/01/1980" />
+
+        <label>City of Birth</label>
+        <input type="text" name="birth_place" placeholder="Surrey UK" />
+
+        <label>BTC address (for payment ledger)</label>
+        <input type="text" name="btc_address" placeholder="bc1q..." />
+
+        <div class="card accent" style="margin-top:1.25rem">
+          <p style="margin:0 0 .5rem"><strong>Consent</strong></p>
+          <p class="sub" style="margin:0 0 .75rem">Enrollment is voluntary and your
+            personal information is encrypted.
+            (a) You consent to this novel encrypted communication.
+            (b) Your BTC wallet keeps a ledger of payments.
+            (c) An ID is generated from the information entered.</p>
+          <div class="radio-row">
+            <label><input type="radio" name="agree" value="yes" /> I agree</label>
+            <label><input type="radio" name="agree" value="no" checked /> No</label>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn">SUBMIT</button>
+        <p id="enroll-status" class="status"></p>
+      </form>
+    </section>
+
+    <!-- ============ IDENTITY REVEAL ============ -->
+    <section id="identity-view" class="hidden">
+      <h2>✅ Enrollment complete</h2>
+      <div class="warn">
+        <strong>Save this token (nsec).</strong> It is your private key, your messenger
+        login, and your ID. It is shown only once and cannot be recovered.
+      </div>
+
+      <div class="card">
+        <label>Your Token (nsec — keep secret)</label>
+        <div class="token-box" id="nsec-out"></div>
+        <button class="secondary" data-copy="#nsec-out">Copy token</button>
+
+        <label style="margin-top:1.25rem">Your Public ID (npub)</label>
+        <div class="token-box" id="npub-out"></div>
+        <button class="secondary" data-copy="#npub-out">Copy npub</button>
+      </div>
+
+      <div class="qr card hidden" id="qr-card">
+        <label>Scan to use as ID</label>
+        <img id="qr-img" alt="ID QR code" />
+      </div>
+
+      <div class="card accent">
+        <p style="margin:0 0 .5rem"><strong>Contract &amp; Payment</strong></p>
+        <div class="row">
+          <button id="contract-btn" class="secondary">Download Contract (PDF)</button>
+          <button id="payment-btn" class="secondary">Set up $20/mo BTC Payment</button>
+        </div>
+        <div id="payment-box" class="hidden" style="margin-top:1rem">
+          <p class="kv"><b>Pay to</b> <span id="pay-addr"></span></p>
+          <p class="kv"><b>Amount</b> <span id="pay-amt"></span></p>
+          <p class="kv"><b>Due</b> <span id="pay-due"></span></p>
+          <label>Payment request (BIP21)</label>
+          <div class="token-box" id="pay-uri"></div>
+          <button class="secondary" data-copy="#pay-uri">Copy</button>
+          <div class="qr"><img id="pay-qr" alt="Payment QR" /></div>
+          <p class="status" id="pay-note"></p>
+        </div>
+      </div>
+
+      <button id="goto-messenger">Continue to Messenger →</button>
+    </section>
+
+    <!-- ============ MESSENGER ============ -->
+    <section id="messenger-view" class="hidden">
+      <h2>Secure Messenger</h2>
+      <p class="sub">Encrypted direct messages with your hospital hub. Refreshes live.</p>
+
+      <div id="mailbox" class="mailbox"></div>
+      <p id="mb-status" class="status"></p>
+
+      <div class="send-row">
+        <input type="text" id="mail-input" placeholder="Type a message…" />
+        <button id="send-btn">Send</button>
+        <button id="refresh-btn" class="secondary">Refresh</button>
+      </div>
+
+      <button class="ghost" id="logout-btn" style="margin-top:1rem">Log out (forget token on this device)</button>
+    </section>
+
+    <!-- ============ RETURNING-USER LOGIN ============ -->
+    <section id="login-view" class="hidden">
+      <h2>Welcome back</h2>
+      <p class="sub">A token is saved on this device. Open your messenger or enroll again.</p>
+      <button id="open-messenger">Open Messenger</button>
+      <button id="new-enroll" class="secondary">New Enrollment</button>
+    </section>
+
+  </main>
+
+  <script src="/js/api.js?v=8"></script>
+  <script src="/user/user.js?v=8"></script>
+</body>
+</html>

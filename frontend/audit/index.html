@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a152c" />
+  <title>Darnahi · BTC Audit</title>
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" href="/assets/favicon.png" />
+  <link rel="stylesheet" href="/css/style.css?v=3" />
+</head>
+<body>
+  <header class="bar">
+    <h1><img class="logo" src="/assets/favicon.png" alt="" /><span class="txt">Darnahi · BTC Audit</span></h1>
+    <div class="right">
+      <a class="btn secondary" href="/provider/">← Dashboard</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- Pull transactions for an address -->
+    <section>
+      <h2>BTC Payment Audit</h2>
+      <p class="sub">Enter a BTC address to pull its latest on-chain transactions.
+        They're saved and linked to a member npub when the address matches.</p>
+      <label>BTC address</label>
+      <input type="text" id="addr-input" placeholder="bc1q… / 3… / 1…" />
+      <div class="send-row" style="margin-top:.6rem">
+        <button id="audit-btn">Audit (last 20)</button>
+        <button id="clear-btn" class="secondary">Clear</button>
+      </div>
+      <p id="audit-status" class="status"></p>
+
+      <div id="link-card" class="card hidden" style="margin-top:1rem">
+        <p class="kv"><b>Address</b> <span id="o-addr"></span></p>
+        <p class="kv"><b>Linked member</b> <span id="o-npub">—</span></p>
+        <p class="kv"><b>Pulled</b> <span id="o-count">0</span> transactions</p>
+      </div>
+
+      <div id="tx-wrap" class="hidden" style="margin-top:1rem">
+        <div id="tx-table"></div>
+        <button id="more-btn" class="secondary hidden" style="margin-top:.75rem">Pull next 30 →</button>
+      </div>
+    </section>
+
+    <hr style="margin:1.75rem 0; border:none; border-top:1px solid #e6e6ef" />
+
+    <!-- Search persisted audits -->
+    <section>
+      <h2>Search Audits</h2>
+      <p class="sub">Search saved transactions by member npub or BTC address.</p>
+      <div class="send-row">
+        <input type="text" id="search-input" placeholder="npub… or bc1q…" />
+        <button id="search-btn">Search</button>
+      </div>
+      <p id="search-status" class="status"></p>
+      <div id="search-table"></div>
+    </section>
+
+  </main>
+
+  <script src="/js/api.js?v=3"></script>
+  <script src="/audit/audit.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+# Darnahi · Project Hidra — full stack (app + PostgreSQL).
+#
+#   docker compose up -d        # build + start everything
+#   open http://localhost:8000
+#   docker compose logs -f app  # follow logs
+#   docker compose down         # stop (data persists in named volumes)
+#
+# Override secrets via a `.env` file next to this one (compose reads it):
+#   HIDRA_PROVIDER_TOKEN=<long-random-string>
+#   HIDRA_DB_PASSWORD=<long-random-string>
+#   HIDRA_PORT=8000
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hidra
+      POSTGRES_PASSWORD: ${HIDRA_DB_PASSWORD:-hidra_secret}
+      POSTGRES_DB: hidra
+    volumes:
+      - hidra_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hidra -d hidra"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # App talks to the db service over the compose network (internal port 5432).
+      HIDRA_DATABASE_URL: postgresql://hidra:${HIDRA_DB_PASSWORD:-hidra_secret}@db:5432/hidra
+      HIDRA_PROVIDER_TOKEN: ${HIDRA_PROVIDER_TOKEN:-token123}
+      HIDRA_CORS_ORIGINS: ${HIDRA_CORS_ORIGINS:-}
+    ports:
+      - "${HIDRA_PORT:-8000}:8000"
+    volumes:
+      - hidra_uploads:/app/bill_uploads
+
+volumes:
+  hidra_pgdata:
+  hidra_uploads:

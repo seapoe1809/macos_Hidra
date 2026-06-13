@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a152c" />
+  <title>Darnahi · Provider</title>
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" href="/assets/favicon.png" />
+  <link rel="stylesheet" href="/css/style.css?v=10" />
+</head>
+<body>
+  <header class="bar">
+    <h1><img class="logo" src="/assets/favicon.png" alt="" /><span class="txt">Darnahi · Provider</span></h1>
+    <div class="right">
+      <button id="logout-btn" class="ghost hidden">Log out</button>
+      <a class="btn secondary" href="/">← Home</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ============ LOGIN ============ -->
+    <section id="login-view">
+      <h2>Provider Login</h2>
+      <p class="sub">Enter your access token to open the dashboard.</p>
+      <label>Access Token</label>
+      <input type="password" id="token-input" placeholder="Enter token" />
+      <p></p>
+      <button id="login-btn">Validate Token</button>
+      <button id="show-register" class="secondary">Register a Hospital</button>
+      <p id="login-status" class="status"></p>
+    </section>
+
+    <!-- ============ REGISTER ============ -->
+    <section id="register-view" class="hidden">
+      <h2>Register Hospital</h2>
+      <p class="sub">Create a provider, set the plan ($20/mo, cogs + 10%), and get a
+        shareable enrollment link for individuals.</p>
+      <form id="register-form">
+        <label>Hospital name <span style="color:#c0392b">*</span></label>
+        <input type="text" name="name" placeholder="St Mercy Hospital" required />
+
+        <label>Address</label>
+        <input type="text" name="address" placeholder="123 Main St, Hartford, CT" />
+
+        <label>BTC address (receives monthly payments) <span style="color:#c0392b">*</span></label>
+        <input type="text" name="btc_address" placeholder="bc1q..." required />
+
+        <label>Hub npub <span style="color:#c0392b">*</span> — leave blank to auto-generate a key you must save</label>
+        <input type="text" name="npub" placeholder="npub1… (or blank to generate)" />
+
+        <label>Services offered</label>
+        <div class="row" style="gap:.25rem 1rem; display:flex; flex-wrap:wrap">
+          <label><input type="checkbox" name="services" value="inpatient" /> Inpatient</label>
+          <label><input type="checkbox" name="services" value="clinic" /> Clinic</label>
+          <label><input type="checkbox" name="services" value="telemed" /> Telemed</label>
+          <label><input type="checkbox" name="services" value="medicines" /> Medicines</label>
+          <label><input type="checkbox" name="services" value="er" /> ER visit</label>
+          <label><input type="checkbox" name="services" value="labs" /> Labs</label>
+          <label><input type="checkbox" name="services" value="hospice" /> Hospice</label>
+          <label><input type="checkbox" name="services" value="home_health" /> Home health</label>
+        </div>
+        <label style="margin-top:.5rem">Other services (comma-separated)</label>
+        <input type="text" name="services_other" placeholder="e.g. dialysis, dental" />
+
+        <div class="row" style="margin-top:.5rem">
+          <div><label>Monthly $ (pmpm)</label><input type="text" name="monthly_usd" value="20" /></div>
+          <div><label>Markup % over cogs</label><input type="text" name="markup_pct" value="10" /></div>
+        </div>
+
+        <button type="submit">Sign & Create</button>
+        <button type="button" id="back-to-login" class="secondary">Back to Login</button>
+      </form>
+      <div id="register-result" class="card hidden">
+        <p><strong>✅ Provider created.</strong></p>
+        <p class="kv"><b>Provider ID</b> <span id="r-pid"></span></p>
+
+        <!-- shown only when a key was auto-generated -->
+        <div id="r-genkey" class="warn hidden" style="margin:.75rem 0">
+          <strong>Save this key.</strong> It was generated for you, is your dashboard
+          login token, and is shown only once.
+          <label style="margin-top:.5rem">Your Token (nsec — keep secret)</label>
+          <div class="token-box" id="r-nsec"></div>
+          <button class="secondary" data-copy="#r-nsec">Copy token</button>
+          <label style="margin-top:.5rem">Your Public ID (npub)</label>
+          <div class="token-box" id="r-npub"></div>
+          <button class="secondary" data-copy="#r-npub">Copy npub</button>
+        </div>
+
+        <label>Login token (use this to open the dashboard)</label>
+        <div class="token-box" id="r-token"></div>
+        <button class="secondary" data-copy="#r-token">Copy token</button>
+
+        <label style="margin-top:.75rem">Shareable enrollment link</label>
+        <div class="token-box" id="r-link"></div>
+        <button class="secondary" data-copy="#r-link">Copy link</button>
+        <div class="row" style="margin-top:.75rem">
+          <button id="r-dashboard">Open Dashboard →</button>
+          <button class="secondary" id="r-contract">Download Contract (PDF)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section id="dashboard-view" class="hidden">
+      <h2>Hospital Dashboard</h2>
+      <div class="row" style="align-items:flex-end">
+        <div><label>Provider ID (context for intake/bills)</label>
+          <input type="text" id="ctx-provider" placeholder="1" /></div>
+        <div><label>Hospital BTC address</label>
+          <input type="text" id="ctx-btc" placeholder="bc1q..." /></div>
+        <div><label>Hub Token (nsec — reads the mailbox)</label>
+          <input type="password" id="hub-nsec" placeholder="nsec1..." /></div>
+        <div style="flex:0"><button id="connect-hub" class="btn-sm">Go</button></div>
+      </div>
+
+      <div class="grid2">
+        <!-- Box 1: Messenger hub -->
+        <div class="box">
+          <h3><span class="n">1</span> Messenger (Hub)</h3>
+          <p class="sub" style="font-size:.8rem">Connect with the hub token above,
+            then open the full messenger in a new page to read &amp; reply.</p>
+          <button id="open-messenger">Open Messenger →</button>
+          <p id="hub-status" class="status"></p>
+        </div>
+
+        <!-- Box 2: ID check -->
+        <div class="box">
+          <h3><span class="n">2</span> ID Check</h3>
+          <p class="sub" style="font-size:.8rem">Enter any <b>2 of</b>: npub, year of birth,
+            last name, place of birth.</p>
+          <div class="field-sm">
+            <label>Member npub (optional)</label>
+            <input type="text" id="idc-npub" placeholder="npub1..." />
+            <div class="row">
+              <input type="text" id="idc-yob" placeholder="Year of birth" />
+              <input type="text" id="idc-last" placeholder="Last name" />
+            </div>
+            <input type="text" id="idc-city" placeholder="Place of birth" style="margin-top:.4rem" />
+            <button id="idc-btn" style="margin-top:.5rem">Check</button>
+            <p id="idc-result" class="status"></p>
+          </div>
+        </div>
+
+        <!-- Box 3: Audit -->
+        <div class="box">
+          <h3><span class="n">3</span> BTC Payment Audit</h3>
+          <p class="sub" style="font-size:.8rem">Pull on-chain transactions, link members,
+            and search saved audits on a dedicated page.</p>
+          <button id="open-audit">Open BTC Audit →</button>
+        </div>
+
+        <!-- Box 4: Bills -->
+        <div class="box">
+          <h3><span class="n">4</span> Bills (by messenger id)</h3>
+          <p class="sub" style="font-size:.8rem">Add bills by npub with amount, date &amp; an
+            attached PDF/photo; search and mark paid on a dedicated page.</p>
+          <button id="open-bills">Open Bills →</button>
+        </div>
+      </div>
+
+      <!-- Member enrollment link — bottom of dashboard -->
+      <div class="row" style="align-items:flex-end; margin-top:1.25rem">
+        <div style="flex:1">
+          <label>Member enrollment link (share with individuals)</label>
+          <div class="token-box" id="dash-enroll-link">Enter Provider ID above to load the link</div>
+        </div>
+        <div style="flex:0"><button class="secondary btn-sm" id="copy-enroll-link">Copy</button></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/js/api.js?v=10"></script>
+  <script src="/provider/provider.js?v=10"></script>
+</body>
+</html>

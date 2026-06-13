@@ -1,0 +1,25 @@
+# Darnahi · Project Hidra — backend dependencies
+
+# web
+fastapi>=0.128
+uvicorn[standard]>=0.40
+websockets>=16          # live mailbox WebSocket (/api/messages/ws)
+pydantic>=2.12
+python-multipart>=0.0.9 # multipart form uploads (bill attachments)
+
+# data / outbound
+requests>=2.32
+psycopg[binary]>=3.2    # PostgreSQL driver
+reportlab>=4.5          # contract PDF
+qrcode>=8               # QR of key / payment URI
+
+# crypto / nostr
+git+https://github.com/callebtc/python-nostr.git
+bech32>=1.2
+ecdsa>=0.19
+base58>=2.1
+pycryptodome>=3.20
+cryptography>=46
+
+# optional: Monero wallet generation/audit (imported lazily)
+monero>=1.1

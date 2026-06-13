@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a152c" />
+  <title>Darnahi · Messenger</title>
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" href="/assets/favicon.png" />
+  <link rel="stylesheet" href="/css/style.css?v=2" />
+</head>
+<body>
+  <header class="bar">
+    <h1><img class="logo" src="/assets/favicon.png" alt="" /><span class="txt">Darnahi · Messenger</span></h1>
+    <div class="right">
+      <a class="btn secondary" href="/provider/">← Dashboard</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- Connect (only shown if no token found on this device) -->
+    <section id="connect-view" class="hidden">
+      <h2>Open Mailbox</h2>
+      <p class="sub">Paste the token (nsec) whose mailbox you want to read.</p>
+      <label>Token (nsec)</label>
+      <input type="password" id="nsec-input" placeholder="nsec1…" />
+      <p></p>
+      <button id="connect-btn">Connect</button>
+      <p id="connect-status" class="status"></p>
+    </section>
+
+    <!-- Mailbox -->
+    <section id="mailbox-view" class="hidden">
+      <h2>MailBox</h2>
+
+      <div class="card">
+        <label>This is your Token (npub) — share it so others can message you</label>
+        <div class="token-box" id="npub-out"></div>
+        <button class="secondary" data-copy="#npub-out">Copy npub</button>
+      </div>
+
+      <div id="mailbox" class="mailbox"></div>
+      <p id="mb-status" class="status"></p>
+
+      <label>Receiver (npub) — tap a conversation above to fill this</label>
+      <input type="text" id="recipient" placeholder="npub… (leave blank to message the hub)" />
+
+      <div class="send-row">
+        <input type="text" id="mail-input" placeholder="Enter message…" />
+        <button id="send-btn">Send Message</button>
+        <button id="refresh-btn" class="secondary">Refresh Mailbox</button>
+      </div>
+
+      <button class="ghost" id="forget-btn" style="margin-top:1rem">Forget token on this device</button>
+    </section>
+
+  </main>
+
+  <script src="/js/api.js?v=2"></script>
+  <script src="/messenger/messenger.js?v=2"></script>
+</body>
+</html>
