@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Darnahi · Project Hidra — launcher. Run ./setup.py once first, then ./darnahi.
+set -euo pipefail
+cd "$(dirname "$0")"
+
+HOST="${HIDRA_HOST:-0.0.0.0}"
+PORT="${HIDRA_PORT:-8000}"
+
+# 1. Ensure setup has been run.
+if [ ! -x "hvenv/bin/uvicorn" ]; then
+  echo "✗ Virtualenv not found. Run first:  python3 setup.py"
+  exit 1
+fi
+if [ ! -f ".env" ]; then
+  echo "✗ .env not found. Run first:  python3 setup.py"
+  exit 1
+fi
+
+# 2. Make sure the Postgres container is up (no-op if you use your own DB).
+if command -v docker >/dev/null 2>&1; then
+  if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx 'hidra-pg'; then
+    docker start hidra-pg >/dev/null 2>&1 || true
+  fi
+fi
+
+echo "▶ Darnahi · Project Hidra"
+echo "  http://localhost:${PORT}    (Ctrl+C to stop)"
+
+# 3. Launch the API + frontend. config.py loads .env automatically.
+exec hvenv/bin/uvicorn backend.main:app --host "$HOST" --port "$PORT"
