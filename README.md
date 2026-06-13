@@ -1,6 +1,8 @@
 # macos_Hidra
 Project Hidra in Mac
 
+SEE https://github.com/seapoe1809/Hidra
+
 # Darnahi · Project Hidra — macOS
 
 Run the whole thing from the Terminal (or by double-clicking in Finder).
